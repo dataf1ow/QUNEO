@@ -1,0 +1,18 @@
+Import the QuNeo preset to your QuNeo using the editor. 
+
+Drop The KMI folder into the 'ControlSurfaceScripts' folder in the Bitwig application package.
+
+On Mac: HD/applications/BitwigStudio/Resources/ControlSurfaceScripts
+On Windows:  C:\Program Files\Bitwig Studio\resources\controllers
+
+Documentation on the layout is included in the KMI_BitwigScripts Folder. 
+
+Ver 0.1 - Basic parameter control, transport control, track select, 
+	  send levels and note input. 
+
+Ver 0.2 - Added scales, , root offset, and scale scrolling. 
+	  Added macro/parameter control switching
+
+Ver 0.3 - Added in key scales. Control surface .html File, and documentation 
+
+This is a first version beta! Please email me at evanbeta@keithmcmillen.com for bug reporting, feature requests, fan mail etc.
