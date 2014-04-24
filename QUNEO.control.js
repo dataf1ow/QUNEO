@@ -4,13 +4,14 @@ host.defineController("Keith McMillen Instruments", "QUNEO", "1.0", "9BE40A60-B5
 host.defineMidiPorts(1,1);
 host.addDeviceNameBasedDiscoveryPair(["QUNEO"], ["QUNEO"]);
 
-
+/////Loading external Files
 load("QUNEO_functions.js")
 load("QUNEO_pages.js")
 load("QUNEO_parameterPage.js")
 load("QUNEO_notes.js")
+load("QUNEO_clips.js")
 
-
+////Defining Variables
 
 var on = true
 var paramPage = 1;
@@ -21,19 +22,35 @@ var macroValues =  initArray(0, 8);
 var trackName = "tracks";
 var activePage = parameterPage;
 var translationTable = initArray(60, 128);
+var noteOffTable = initArray(-1, 128);
 var noteIn = new Object();
 var translate = new Object();
+var padPage = notePage;
 var pageIndex = pageNames.length
+var modeSelect = false;
 
+var hasContent = initArray(0, 16);
+var isPlaying = initArray(0, 16);
+var isRecording = initArray(0, 16);
+var isQueued = initArray(0, 16);
+//var lights = setTimeout(function(){}, 200);
+/*
+function randomLights()
+					{
+						pad = Math.round(Math.random() * 32)
+						value = Math.round(Math.random() * 127)
+						sendMidi(144, pad, value);
+					}
 
+host.scheduleTask(function(randomLights){}, [ ], 1)
+*/
+/////////////////
 
 function init()
 {
 	host.getMidiInPort(0).setMidiCallback(onMidi);
 	noteIn = host.getMidiInPort(0).createNoteInput("QUNEO", "80????", "90????")
 	noteIn.setShouldConsumeEvents(false);
-	updateTranslationTable();
-	noteIn.setKeyTranslationTable(translationTable);
 	println("These ARE the pads you're looking....guy")
 	sendMidi(144, 36, 127);
 	sendMidi(144, 37, 127);
@@ -42,12 +59,14 @@ function init()
 	sendMidi(144, 42, 127);
 	sendMidi(144, 43, 127);
 	padLED();
+	updateTranslationTable();
+	//standardVelocity();
     
 	////////Views
 
 	transport = host.createTransport();
 	application = host.createApplication();
-	trackBank = host.createTrackBank(8, 1, 0);
+	trackBank = host.createTrackBank(4, 2, 4);
 	cursorTrack = host.createCursorTrack(2, 0);
 	cursorDevice = host.createCursorDeviceSection(8);
 	primaryDevice = cursorTrack.getPrimaryDevice();
@@ -100,7 +119,7 @@ function init()
 	primaryDevice.addSelectedPageObserver(8, function(page)
 	{
 		paramPage = page;
-		
+		host.showPopupNotification("Parameter Page = " + pageNames[paramPage]);
 		
 	})
 
@@ -115,9 +134,9 @@ function init()
 			if (activePage == parameterPage)
 				{
 					paramLED(index, value);
-					host.showPopupNotification("Parameter Page = " + pageNames[paramPage]);
+					
 				}
-		
+			
 		}));
 		// parameter.setLabel("P" + (p + 1));
 	}
@@ -135,6 +154,17 @@ function init()
 					macroLED(index, value);
 				}
 			}));
+
+	for (var t = 0; t < 4; t++)
+		{
+			var track = trackBank.getTrack(t); 
+			var clipLauncher = track.getClipLauncher();
+
+			clipLauncher.addHasContentObserver(getGridObserverFunc(t, hasContent));
+			
+			
+		}
+
 	}
 
 	
@@ -149,8 +179,16 @@ function makeIndexedFunction(index, f)
 { 
 	return function(value)
 	{
-		f(index, value);
+		f[index] = value;
 	};
+}
+
+function getGridObserverFunc(track, varToStore)
+{
+   return function(scene, value)
+   {
+      varToStore[scene*4 + track] = value;
+   }
 }
 
 var devicePage = new Object{};
@@ -165,8 +203,8 @@ devicePage.updateIndications = function()
 		parameter.setIndication(false);///Tells Bitwig to delete previous color association. 
 		parameter.setIndication(true );///Tells BitWig to associate the color with the parameters. 
 		macro.setIndication(true);
-		track.getVolume().setIndication(false);
-		track.getPan().setIndication(false);
+		//track.getVolume().setIndication(false);
+		//track.getPan().setIndication(false);
 	}
 }
 
@@ -176,7 +214,7 @@ function onMidi(status, data1, data2)
 		//println(status + " " + data1 + " " + data2)
 		
 			if (isChannelController(status))
-			{
+			{   
 				if (data1 <= 8)
 					{
 						if (activePage == parameterPage)
@@ -198,6 +236,7 @@ function onMidi(status, data1, data2)
 					}
 
 			}else{
+				//println(data1 + " " + data2 + " " + status)
 				rootOffsetIndex(data1, data2)
 				scaleTypeScroll(data1, data2);
 				scaleIndexScroll(data1, data2);
@@ -205,7 +244,55 @@ function onMidi(status, data1, data2)
 				parameterSelect(data1, data2);
 				trackSelect(data1, data2);
 				pageSelect(data1, data2);
+				
+				if (modeSelect == true)
+						{
+							if (data1 < 8)
+							{	
+								padPage = notePage
+								
+							}else if (modeSelect = true && data1 > 7 && data1 < 16)
+							{
+								padPage = clipPage
+								
+							}
+						}
 
+				if (data1 == 127 && data2 == 127)
+				{
+					for (var i = 0; i < 32; i ++)
+					{
+						sendMidi(144, i, 0); //clear all Pads
+					}
+					for (var i = 0; i < 16; i +=2 )
+					{
+						sendMidi(144, i, 127)
+					}
+					for (var i = 17; i < 32; i +=2 )
+					{
+						sendMidi(144, i, 127)
+					}
+					
+					modeSelect = true;
+					println(modeSelect)
+					noteIn.setKeyTranslationTable(noteOffTable);
+				}	
+					
+
+				if (data1 == 127 && data2 == 0)
+					{
+						modeSelect = false
+						if (padPage == notePage)
+						{
+							padLED();
+							noteIn.setKeyTranslationTable(translationTable);
+						}else if(padPage == clipPage)
+						{
+							clipLED();
+							noteIn.setKeyTranslationTable(noteOffTable);
+						}
+						
+					}
 				
 			}
 		

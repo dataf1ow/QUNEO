@@ -9,6 +9,10 @@ var minorScaleOne = [0, 2, 3, 5, 7, 8, 10, 12, 14, 15];
 var minorScaleTwo = [1, 3, 4, 6, 8, 10, 11, 13, 15];
 var minorScaleThree = [0, 2, 4, 6, 7, 9, 11, 12, 14];
 
+var majorScaleInKey = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24, 26]
+var minorScaleInKey = [0, 2, 3, 5, 7, 8, 10, 12, 14, 15, 17, 19, 20, 22, 24, 26]
+var scaleInKey = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+
 var majorScales = 
 	{
 		one: majorScaleOne,
@@ -22,15 +26,16 @@ var minorScales =
 		two: minorScaleTwo,
 		three: minorScaleThree,
 	};
-var scaleName = ["Major", "Minor"];
+
+var scaleName = ["Major", "Minor", "Major In Key", "Minor In Key"];
 var scaleTypeIndex = 0
 var scaleLength = 9;
-var scaleType = scaleTypeIndex
 var scale = majorScales.one;
 var GREEN_LEDS = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30];
 var RED_LEDS = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31];
 var scaleRoot = (scaleIndex % 3) * 4;
 var scaleIndex = 9;
+var scaleIndexInKey = 3;
 var rootOffset = 60;
 var roots = ["C", "C#/Db", "D", "D#/Eb", "E","F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"];
 
@@ -61,19 +66,76 @@ function scaleScroll(){
 			scale = minorScales.three
 		}
 		scaleLength = scale.length
+	}else if (scaleTypeIndex > 1)
+	{
+		
+			scale = scaleInKey
+		
 	}	
 }
 
+
+function octaveNotification()
+{
+	switch (scaleIndex / 3)
+		{
+			case 0:
+				host.showPopupNotification("Octave -2")
+				break;
+
+			case 1:
+				host.showPopupNotification("Octave -1")
+				break;
+
+			case 2:
+				host.showPopupNotification("Octave 0")
+				break;
+
+			case 3:
+				host.showPopupNotification("Octave 1")
+				break;
+
+			case 4:
+				host.showPopupNotification("Octave 2")
+				break;
+
+			case 5:
+				host.showPopupNotification("Octave 3")
+				break;
+
+			case 6:
+				host.showPopupNotification("Octave 4")
+				break;
+
+			case 7:
+				host.showPopupNotification("Octave 5")
+				break;
+
+			case 8:
+				host.showPopupNotification("Octave 6")
+				break;
+				
+			case 9:
+				host.showPopupNotification("Octave 7")
+				break;
+
+			case 10:
+				host.showPopupNotification("Octave 8")
+				break;
+		}
+};
 
 function padLED ()
 	{
 		for (var i = 0; i < 32; i ++)
 					{
-						sendMidi(144, i, 0);
-
+						sendMidi(144, i, 0); //clear all Pads
 					};
-					scaleScroll();
 
+		
+		 if (scaleTypeIndex == 0 || scaleTypeIndex == 1)
+				{	
+					scaleScroll();
 					for (var i = 0 ; i < scale.length ; i++)
 					{
 						sendMidi(144 , GREEN_LEDS[scale[i]], 127)
@@ -94,33 +156,78 @@ function padLED ()
 								sendMidi(144 , (RED_LEDS[scale[2]]), 80)
 							}
 					}
+				}else if (scaleTypeIndex == 2 || scaleTypeIndex ==  3)
+				{
+					for (var i = 0; i < 16; i++)
+					{
+						sendMidi(144, GREEN_LEDS[i], 127)
+						if(i % 7 == 0)
+						{
+							sendMidi(144, RED_LEDS[i], 127)
+						}
+					}
+				}
 	}
 
 function scaleIndexScroll(data1, data2)
 	{
-		if (data1 == 25 && data2 == 127)
-				{
-					if (scaleIndex == 32){
-						scaleIndex == 32
-					}else{
-						scaleIndex ++;
+		if (scaleTypeIndex == 0 || scaleTypeIndex == 1)
+		{	
+			if (data1 == 25 && data2 == 127)
+					{
+						if (scaleIndex == 32){
+							scaleIndex == 32
+						}else{
+							scaleIndex ++;
+						}
+						padLED();
+						updateTranslationTable();
+						octaveNotification();
 					}
-					padLED();
-					updateTranslationTable();
 
-				}
-
-				if (data1 == 26 && data2 == 127)
-				{
-					if (scaleIndex == 0){
-						scaleIndex == 0
-					}else{
-						scaleIndex --;
+					if (data1 == 26 && data2 == 127)
+					{
+						if (scaleIndex == 0){
+							scaleIndex == 0
+						}else{
+							scaleIndex --;
+						}
+						padLED();
+						updateTranslationTable();
+						octaveNotification();
+						
 					}
-					padLED();
-					updateTranslationTable();
+				
 					
-				}
+		}else if (scaleTypeIndex == 2 || scaleTypeIndex == 3)
+		{	
+			if (data1 == 25 && data2 == 127)
+					{
+						if (scaleIndex >= 30){
+							scaleIndex == 30
+						}else{
+							scaleIndex += 3;
+						}
+						
+						updateTranslationTable();
+						octaveNotification();
+
+					}
+
+					if (data1 == 26 && data2 == 127)
+					{
+						if (scaleIndex == 0){
+							scaleIndex == 0
+						}else{
+							scaleIndex -= 3;
+						}
+						
+						updateTranslationTable();
+						octaveNotification();
+					}
+					
+		}
+
 	}
 
 function scaleNotifications (){
@@ -130,15 +237,19 @@ function scaleNotifications (){
 		}else if (scaleTypeIndex == 1)
 		{
 			host.showPopupNotification("Minor")
-		}
+		}else if (scaleTypeIndex == 2)
+		{
+			host.showPopupNotification("Major In Key")
+		}else if (scaleTypeIndex == 3)
+			host.showPopupNotification("Minor In Key")
 	}
 
 function scaleTypeScroll(data1, data2)
 	{
 		if (data1 == 27 && data2 == 127)
 				{
-					if (scaleTypeIndex == 1)
-						{scaleTypeIndex = 1
+					if (scaleTypeIndex == 3)
+						{scaleTypeIndex = 3
 					}else
 					{
 						scaleTypeIndex ++;
@@ -146,6 +257,10 @@ function scaleTypeScroll(data1, data2)
 					
 					padLED();
 					scaleNotifications();
+					if (scaleTypeIndex > 1)
+					updateTranslationTable();
+					
+					
 				}
 
 				if (data1 == 28 && data2 ==127)
@@ -159,29 +274,73 @@ function scaleTypeScroll(data1, data2)
 					
 					padLED();
 					scaleNotifications();
+					updateTranslationTable();
 				}
+
 	}
 
 
 function updateTranslationTable ()
 	{
-		for (var i = 0; i < 127; i ++)å
-		{
-			var offset = (i + scaleIndex * 4) + (rootOffset % 12);
-			if (offset >= 127)
+		if (scaleTypeIndex < 2)
 			{
-				offset = 127
+
+				for (var i = 0; i < 127; i ++)
+				{
+					var offset = (i + scaleIndex * 4) + (rootOffset % 12);
+					if (offset >= 127)
+					{
+						offset = 127
+					}
+
+					translationTable[i] = offset;
+				}
+			}else
+			{
+				if (scaleTypeIndex > 1)
+						{
+							
+							if (scaleIndex % 3 == 0)
+								{
+									scaleIndex = scaleIndex;
+								}else if(scaleIndex % 3 == 1)
+								{
+									scaleIndex = (scaleIndex - 1);
+								}else if(scaleIndex % 3 == 2)
+								{
+									scaleIndex = (scaleIndex + 1);
+								}
+						}
 			}
 
-			translationTable[i] = offset;
+		if (scaleTypeIndex == 2)
+			{
+				for (var i = 0; i < 16; i ++)
+				{
+					var offset = (majorScaleInKey[i] + scaleIndex * 4) + (rootOffset % 12);
+					if (offset >= 127)
+					{
+						offset = 127
+					}
+					translationTable[i] = offset;
+				}
+			}else if (scaleTypeIndex == 3)
+				{
+					for (var i = 0; i < 127; i ++)
+					{
+						var offset = (minorScaleInKey[i] + scaleIndex * 4) + (rootOffset % 12);
+						if (offset >= 127)
+						{
+							offset = 127
+						}
+					translationTable[i] = offset;
 
-			
+				}
 
 		}
 		noteIn.setKeyTranslationTable(translationTable);
-		println(translationTable[0]);
+		
 	}
-
 
 
 function rootOffsetIndex(data1, data2)
