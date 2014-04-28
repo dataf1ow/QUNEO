@@ -171,63 +171,65 @@ function padLED ()
 
 function scaleIndexScroll(data1, data2)
 	{
-		if (scaleTypeIndex == 0 || scaleTypeIndex == 1)
+		if (padPage == notePage)
 		{	
-			if (data1 == 25 && data2 == 127)
-					{
-						if (scaleIndex == 32){
-							scaleIndex == 32
-						}else{
-							scaleIndex ++;
+			if (scaleTypeIndex == 0 || scaleTypeIndex == 1)
+			{	
+				if (data1 == 25 && data2 == 127)
+						{
+							if (scaleIndex == 32){
+								scaleIndex == 32
+							}else{
+								scaleIndex ++;
+							}
+							padLED();
+							updateTranslationTable();
+							octaveNotification();
 						}
-						padLED();
-						updateTranslationTable();
-						octaveNotification();
-					}
 
-					if (data1 == 26 && data2 == 127)
-					{
-						if (scaleIndex == 0){
-							scaleIndex == 0
-						}else{
-							scaleIndex --;
+						if (data1 == 26 && data2 == 127)
+						{
+							if (scaleIndex == 0){
+								scaleIndex == 0
+							}else{
+								scaleIndex --;
+							}
+							padLED();
+							updateTranslationTable();
+							octaveNotification();
+							
 						}
-						padLED();
-						updateTranslationTable();
-						octaveNotification();
-						
-					}
-				
 					
-		}else if (scaleTypeIndex == 2 || scaleTypeIndex == 3)
-		{	
-			if (data1 == 25 && data2 == 127)
-					{
-						if (scaleIndex >= 30){
-							scaleIndex == 30
-						}else{
-							scaleIndex += 3;
+						
+			}else if (scaleTypeIndex == 2 || scaleTypeIndex == 3)
+			{	
+				if (data1 == 25 && data2 == 127)
+						{
+							if (scaleIndex >= 30){
+								scaleIndex == 30
+							}else{
+								scaleIndex += 3;
+							}
+							
+							updateTranslationTable();
+							octaveNotification();
+
+						}
+
+						if (data1 == 26 && data2 == 127)
+						{
+							if (scaleIndex == 0){
+								scaleIndex == 0
+							}else{
+								scaleIndex -= 3;
+							}
+							
+							updateTranslationTable();
+							octaveNotification();
 						}
 						
-						updateTranslationTable();
-						octaveNotification();
-
-					}
-
-					if (data1 == 26 && data2 == 127)
-					{
-						if (scaleIndex == 0){
-							scaleIndex == 0
-						}else{
-							scaleIndex -= 3;
-						}
-						
-						updateTranslationTable();
-						octaveNotification();
-					}
-					
+			}
 		}
-
 	}
 
 function scaleNotifications (){
@@ -246,37 +248,39 @@ function scaleNotifications (){
 
 function scaleTypeScroll(data1, data2)
 	{
-		if (data1 == 27 && data2 == 127)
-				{
-					if (scaleTypeIndex == 3)
-						{scaleTypeIndex = 3
-					}else
+		if (padPage == notePage)
+		{	
+			if (data1 == 27 && data2 == 127)
 					{
-						scaleTypeIndex ++;
+						if (scaleTypeIndex == 3)
+							{scaleTypeIndex = 3
+						}else
+						{
+							scaleTypeIndex ++;
+						}
+						
+						padLED();
+						scaleNotifications();
+						if (scaleTypeIndex > 1)
+						updateTranslationTable();
+						
+						
 					}
-					
-					padLED();
-					scaleNotifications();
-					if (scaleTypeIndex > 1)
-					updateTranslationTable();
-					
-					
-				}
 
-				if (data1 == 28 && data2 ==127)
-				{
-					if (scaleTypeIndex == 0)
-						{scaleTypeIndex = 0
-					}else
+					if (data1 == 28 && data2 ==127)
 					{
-						scaleTypeIndex --;
+						if (scaleTypeIndex == 0)
+							{scaleTypeIndex = 0
+						}else
+						{
+							scaleTypeIndex --;
+						}
+						
+						padLED();
+						scaleNotifications();
+						updateTranslationTable();
 					}
-					
-					padLED();
-					scaleNotifications();
-					updateTranslationTable();
-				}
-
+		}
 	}
 
 

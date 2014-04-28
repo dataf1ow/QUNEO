@@ -123,6 +123,8 @@ function init()
 		
 	})
 
+
+
 	//Parameters
 	for ( var p = 0; p < 8; p++)
 	{
@@ -163,11 +165,18 @@ function init()
 			clipLauncher.addHasContentObserver(getGridObserverFunc(t, hasContent));
 			
 			
+			clipLauncher.addIsPlayingObserver(getGridObserverFunc(t, isPlaying))
+			{
+				
+			};
+
+			
+			
 		}
 
 	}
 
-	
+	padLED();
 	
 	devicePage.updateIndications();
 
@@ -188,6 +197,7 @@ function getGridObserverFunc(track, varToStore)
    return function(scene, value)
    {
       varToStore[scene*4 + track] = value;
+      clipLED();
    }
 }
 
@@ -236,6 +246,7 @@ function onMidi(status, data1, data2)
 					}
 
 			}else{
+				println(hasContent);
 				//println(data1 + " " + data2 + " " + status)
 				rootOffsetIndex(data1, data2)
 				scaleTypeScroll(data1, data2);
