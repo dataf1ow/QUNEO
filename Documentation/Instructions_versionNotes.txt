@@ -1,6 +1,6 @@
 Import the QuNeo preset to your QuNeo using the editor. 
 
-Drop The KMI folder into the 'ControlSurfaceScripts' folder in the Bitwig application package.
+Drop The 'QUNEO_Script'folder into the 'ControlSurfaceScripts' folder in the Bitwig application package.
 
 On Mac: HD/applications/BitwigStudio/Resources/ControlSurfaceScripts
 On Windows:  C:\Program Files\Bitwig Studio\resources\controllers
