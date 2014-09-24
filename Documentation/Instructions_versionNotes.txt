@@ -1,9 +1,9 @@
-Import the QuNeo preset to your QuNeo using the editor. 
+Import the QuNeo preset to your QuNeo using the editor. There aren’t any name displays, the preset will overwrite whichever slot you have selected on import. Be sure to use a slot that you aren’t fond of. Of course, you can restore defaults at any time, and then re-import on a different slot. 
 
-Drop The 'QUNEO_Script'folder into the 'ControlSurfaceScripts' folder in the Bitwig application package.
-
-On Mac: HD/applications/BitwigStudio/Resources/ControlSurfaceScripts
-On Windows:  C:\Program Files\Bitwig Studio\resources\controllers
+Drop The 'QUNEO_Script'folder into the 'ControlSurfaceScripts' folder in the User Control script folder: 
+ 
+Mac and Linux: ~/Documents/Bitwig Studio/Controller Scripts/
+On Windows:  %USERPROFILE%\Documents\Bitwig Studio\Controller Scripts\
 
 Documentation on the layout is included in the KMI_BitwigScripts Folder. 
 
@@ -15,4 +15,4 @@ Ver 0.2 - Added scales, , root offset, and scale scrolling.
 
 Ver 0.3 - Added in key scales. Control surface .html File, and documentation 
 
-This is a first version beta! Please email me at evanbeta@keithmcmillen.com for bug reporting, feature requests, fan mail etc.
+This is a first version! Please email me at evanbeta@keithmcmillen.com for bug reporting, feature requests, fan mail etc.
