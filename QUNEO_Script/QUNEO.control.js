@@ -28,7 +28,8 @@ var translate = new Object();
 var padPage = notePage;
 var pageIndex = pageNames.length
 var modeSelect = false;
-
+var trackHasChanged = 0;
+var parameterHasChanged = 0;
 var hasContent = initArray(0, 16);
 var isPlaying = initArray(0, 16);
 var isRecording = initArray(0, 16);
@@ -85,8 +86,11 @@ function init()
 	cursorTrack.addNameObserver(128, string ,function(name)
 	{
 		trackName = name;
+
+		if (trackHasChanged == 1){
 		host.showPopupNotification("Track = " + trackName);	
-		
+		trackHasChanged = 0;
+		}
 	})
 
 
@@ -117,10 +121,15 @@ function init()
    });
 
 	primaryDevice.addSelectedPageObserver(8, function(page)
-	{
+	{	
+		println(pageNames[paramPage]);
 		paramPage = page;
-		host.showPopupNotification("Parameter Page = " + pageNames[paramPage]);
-		
+		if (parameterHasChanged == 1){
+			if (pageNames[paramPage] != undefined){
+			host.showPopupNotification("Parameter Page = " + pageNames[paramPage]);
+		}
+		parameterHasChanged = 0;
+		}
 	})
 
 
@@ -246,7 +255,7 @@ function onMidi(status, data1, data2)
 					}
 
 			}else{
-				println(hasContent);
+				//println(hasContent);
 				//println(data1 + " " + data2 + " " + status)
 				rootOffsetIndex(data1, data2)
 				scaleTypeScroll(data1, data2);

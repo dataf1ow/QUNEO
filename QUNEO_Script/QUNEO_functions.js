@@ -33,11 +33,12 @@ function recObserver(on)
 function trackSelect(data1, data2)
 	{
 		if(data1 == 19 && data2 != 0)
-		{
-		
+			{
+			trackHasChanged = 1;
+			parameterHasChanged = 0;
 			cursorTrack.selectPrevious();
 			
-		if (trackName == "Master")
+			if (trackName == "Master")
 			{
 				sendMidi(144, 37, 0)
 			}else{
@@ -46,7 +47,8 @@ function trackSelect(data1, data2)
 			
 		} else if(data1 == 20 && data2 != 0)
 			{
-
+				trackHasChanged = 1;
+				parameterHasChanged = 0;
 				cursorTrack.selectNext();
 				
 		if (trackName == "Master")
@@ -56,7 +58,7 @@ function trackSelect(data1, data2)
 				sendMidi(144,37,127)
 			}
 				
-			}	
+		}	
 	}
 
 
@@ -69,13 +71,21 @@ function trackSelect(data1, data2)
  		if (activePage == parameterPage){
  			if(data1 == 18 && data2 != 0) 
 				{
+					parameterHasChanged = 1;
 					primaryDevice.nextParameterPage();
 					devicePage.updateIndications();
+					if (pageNames[paramPage] == undefined){
+						parameterHasChanged = 0;
+					}
 					
 				}else if(data1 == 17 && data2 != 0)
 				{
+					parameterHasChanged = 1;
 					primaryDevice.previousParameterPage();
 					devicePage.updateIndications();
+					if (pageNames[paramPage] == undefined){
+						parameterHasChanged = 0;
+					}
 					
 				}
 			}
