@@ -3,6 +3,7 @@ loadAPI(1);
 host.defineController("Keith McMillen Instruments", "QUNEO", "1.0", "9BE40A60-B53E-11E3-A5E2-0800200C9A66");
 host.defineMidiPorts(1,1);
 host.addDeviceNameBasedDiscoveryPair(["QUNEO"], ["QUNEO"]);
+host.addDeviceNameBasedDiscoveryPair(["QUNEO MIDI 1"], ["QUNEO MIDI 1"]);
 
 /////Loading external Files
 load("QUNEO_functions.js")
@@ -34,18 +35,6 @@ var hasContent = initArray(0, 16);
 var isPlaying = initArray(0, 16);
 var isRecording = initArray(0, 16);
 var isQueued = initArray(0, 16);
-//var lights = setTimeout(function(){}, 200);
-/*
-function randomLights()
-					{
-						pad = Math.round(Math.random() * 32)
-						value = Math.round(Math.random() * 127)
-						sendMidi(144, pad, value);
-					}
-
-host.scheduleTask(function(randomLights){}, [ ], 1)
-*/
-/////////////////
 
 function init()
 {
