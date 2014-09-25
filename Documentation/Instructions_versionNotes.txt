@@ -1,3 +1,6 @@
+
+This is the KMI bigwig script for the QuNeo controller
+
 Import the QuNeo preset to your QuNeo using the editor. There aren’t any name displays, the preset will overwrite whichever slot you have selected on import. Be sure to use a slot that you aren’t fond of. Of course, you can restore defaults at any time, and then re-import on a different slot. 
 
 Drop The 'QUNEO_Script'folder into the 'ControlSurfaceScripts' folder in the User Control script folder: 
