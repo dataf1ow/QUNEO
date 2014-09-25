@@ -1,4 +1,4 @@
 QUNEO
 =====
 
-QUNEO bitwig script
+QUNEO bitwig script from KMI
