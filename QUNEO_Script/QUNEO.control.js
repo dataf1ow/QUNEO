@@ -1,9 +1,23 @@
+/*
+
+Copyright 2014 Evan Bogunia_____evanbeta@keithmcmillen.com
+
+
+*/
+
+
+
+//Load the bitwig API, obviously.
 loadAPI(1);
 
-host.defineController("Keith McMillen Instruments", "QUNEO", "1.0", "9BE40A60-B53E-11E3-A5E2-0800200C9A66");
-host.defineMidiPorts(1,1);
-host.addDeviceNameBasedDiscoveryPair(["QUNEO"], ["QUNEO"]);
-host.addDeviceNameBasedDiscoveryPair(["QUNEO MIDI 1"], ["QUNEO MIDI 1"]);
+//Define/set our controller properties [ company, device, version, uuid ]
+host.defineController("Keith McMillen Instruments", "QUNEO", "1.0", "A323D780-5AF5-11E4-8ED6-0800200C9A66");
+host.defineMidiPorts(1, 1);
+
+//Define/set input/output port names (both i/o are the same)
+var portNames 	= 	["QUNEO"];
+host.addDeviceNameBasedDiscoveryPair(portNames, portNames);
+//host.addDeviceNameBasedDiscoveryPair(["QUNEO MIDI 1"], ["QUNEO MIDI 1"]);
 
 /////Loading external Files
 load("QUNEO_functions.js")
@@ -36,29 +50,16 @@ var hasContent = initArray(0, 16);
 var isPlaying = initArray(0, 16);
 var isRecording = initArray(0, 16);
 var isQueued = initArray(0, 16);
-<<<<<<< Updated upstream
-=======
 var pendingLEDs = initArray(0, 15);
 var currentLEDs = initArray(0,15);
-//var lights = setTimeout(function(){}, 200);
-/*
-function randomLights()
-					{
-						pad = Math.round(Math.random() * 32)
-						value = Math.round(Math.random() * 127)
-						sendMidi(144, pad, value);
-					}
 
-host.scheduleTask(function(randomLights){}, [ ], 1)
-*/
-/////////////////
->>>>>>> Stashed changes
+
 
 function init()
 {
 	host.getMidiInPort(0).setMidiCallback(onMidi);
 	noteIn = host.getMidiInPort(0).createNoteInput("QUNEO", "82????", "92????")
-	noteIn.setShouldConsumeEvents(true);
+	noteIn.setShouldConsumeEvents(false);
 	println("These ARE the pads you're looking....guy")
 	sendMidi(144, 36, 127);
 	sendMidi(144, 37, 127);
@@ -362,3 +363,4 @@ function exit()
 					}
 
 	}
+

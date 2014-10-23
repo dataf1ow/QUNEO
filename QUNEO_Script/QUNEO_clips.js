@@ -101,7 +101,11 @@ function playingLED()
 
 function recordingLED()
 {
-for (i = ; i <16; i ++)
+	for (i = 0 ; i <16; i ++){
+		if (isRecording[i] == true){
+			pendingLEDs[i] = 3
+		}
+	}
 
 }
 
@@ -132,6 +136,8 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(12)
+			}else if (currentLEDs[index] == 3){
+				RED(12)
 			}
 			break;
 		case 1:
@@ -143,6 +149,8 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(13)
+			}else if (currentLEDs[index] == 3){
+				RED(13)
 			}
 			break;
 		case 2:
@@ -154,6 +162,8 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(14)
+			}else if (currentLEDs[index] == 3){
+				RED(14)
 			}
 			break;
 		case 3:
@@ -165,6 +175,9 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(15)
+
+			}else if (currentLEDs[index] == 3){
+				RED(15)
 			}
 			break;
 		case 4:
@@ -176,6 +189,9 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(8)
+
+			}else if (currentLEDs[index] == 3){
+				RED(8)
 			}
 			break;
 		case 5:
@@ -187,6 +203,9 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(9)
+
+			}else if (currentLEDs[index] == 3){
+				RED(9)
 			}
 			break;
 		case 6:
@@ -198,6 +217,9 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(10)
+
+			}else if (currentLEDs[index] == 3){
+				RED(10)
 			}
 			break;
 		case 7:
@@ -209,6 +231,9 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(11)
+
+			}else if (currentLEDs[index] == 3){
+				RED(11)
 			}
 			break;
 		case 8:
@@ -220,6 +245,9 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(4)
+
+			}else if (currentLEDs[index] == 3){
+				RED(4)
 			}
 			break;
 		case 9:
@@ -231,6 +259,9 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(5)
+
+			}else if (currentLEDs[index] == 3){
+				RED(5)
 			}
 			break;
 		case 10:
@@ -242,6 +273,9 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(6)
+
+			}else if (currentLEDs[index] == 3){
+				RED(6)
 			}
 			break;
 		case 11:
@@ -253,6 +287,9 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(7)
+
+			}else if (currentLEDs[index] == 3){
+				RED(7)
 			}
 			break;
 		case 12:
@@ -264,6 +301,9 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(0)
+
+			}else if (currentLEDs[index] == 3){
+				RED(0)
 			}
 			break;
 		case 13:
@@ -275,6 +315,9 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(1)
+
+			}else if (currentLEDs[index] == 3){
+				RED(1)
 			}
 			break;
 		case 14:
@@ -286,6 +329,9 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(2)
+
+			}else if (currentLEDs[index] == 3){
+				RED(2)
 			}
 			break;
 		case 15:
@@ -297,6 +343,9 @@ function sendClipLEDs(index){
 
 			}else if (currentLEDs[index] == 2){
 				GREEN(3)
+
+			}else if (currentLEDs[index] == 3){
+				RED(3)
 			}
 			break;	
 	}
