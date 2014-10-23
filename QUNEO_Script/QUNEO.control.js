@@ -14,7 +14,8 @@ load("QUNEO_clips.js")
 
 ////Defining Variables
 
-var on = true
+var on = true;
+var initialize = 0;
 var paramPage = 1;
 var pageNames = [8];
 var isMacroMapping = [];
@@ -24,7 +25,7 @@ var trackName = "tracks";
 var activePage = parameterPage;
 var translationTable = initArray(60, 128);
 var noteOffTable = initArray(-1, 128);
-var noteIn = new Object();
+var selectionTable = initArray(60,128)
 var translate = new Object();
 var padPage = notePage;
 var pageIndex = pageNames.length
@@ -35,12 +36,29 @@ var hasContent = initArray(0, 16);
 var isPlaying = initArray(0, 16);
 var isRecording = initArray(0, 16);
 var isQueued = initArray(0, 16);
+<<<<<<< Updated upstream
+=======
+var pendingLEDs = initArray(0, 15);
+var currentLEDs = initArray(0,15);
+//var lights = setTimeout(function(){}, 200);
+/*
+function randomLights()
+					{
+						pad = Math.round(Math.random() * 32)
+						value = Math.round(Math.random() * 127)
+						sendMidi(144, pad, value);
+					}
+
+host.scheduleTask(function(randomLights){}, [ ], 1)
+*/
+/////////////////
+>>>>>>> Stashed changes
 
 function init()
 {
 	host.getMidiInPort(0).setMidiCallback(onMidi);
-	noteIn = host.getMidiInPort(0).createNoteInput("QUNEO", "80????", "90????")
-	noteIn.setShouldConsumeEvents(false);
+	noteIn = host.getMidiInPort(0).createNoteInput("QUNEO", "82????", "92????")
+	noteIn.setShouldConsumeEvents(true);
 	println("These ARE the pads you're looking....guy")
 	sendMidi(144, 36, 127);
 	sendMidi(144, 37, 127);
@@ -48,8 +66,11 @@ function init()
 	sendMidi(144, 39, 127);
 	sendMidi(144, 42, 127);
 	sendMidi(144, 43, 127);
-	padLED();
+	
 	updateTranslationTable();
+	noteIn.setKeyTranslationTable(translationTable);
+	noteIn.setShouldConsumeEvents(false);
+
 	//standardVelocity();
     
 	////////Views
@@ -111,7 +132,7 @@ function init()
 
 	primaryDevice.addSelectedPageObserver(8, function(page)
 	{	
-		println(pageNames[paramPage]);
+		
 		paramPage = page;
 		if (parameterHasChanged == 1){
 			if (pageNames[paramPage] != undefined){
@@ -159,11 +180,12 @@ function init()
 		{
 			var track = trackBank.getTrack(t); 
 			var clipLauncher = track.getClipLauncher();
-
+			clipLauncher.setIndication(true);
+			
 			clipLauncher.addHasContentObserver(getGridObserverFunc(t, hasContent));
-			
-			
-			clipLauncher.addIsPlayingObserver(getGridObserverFunc(t, isPlaying))
+      		clipLauncher.addIsPlayingObserver(getGridObserverFunc(t, isPlaying));
+      		clipLauncher.addIsRecordingObserver(getGridObserverFunc(t, isRecording));
+      		clipLauncher.addIsQueuedObserver(getGridObserverFunc(t, isQueued));
 			{
 				
 			};
@@ -171,15 +193,22 @@ function init()
 			
 			
 		}
+	
+
 
 	}
 
-	padLED();
+	
 	
 	devicePage.updateIndications();
 
 	host.showPopupNotification("These ARE the pads you're looking....guy");
-	
+
+		if (initialize == 0){
+			padLED();
+			initialize = 1
+		}
+	padPage = notePage
 }
 
 function makeIndexedFunction(index, f)
@@ -195,7 +224,9 @@ function getGridObserverFunc(track, varToStore)
    return function(scene, value)
    {
       varToStore[scene*4 + track] = value;
+      if (padPage == clipPage){
       clipLED();
+  		}
    }
 }
 
@@ -209,7 +240,7 @@ devicePage.updateIndications = function()
 		parameter = primaryDevice.getParameter(p);
 		track = trackBank.getTrack(p);
 		parameter.setIndication(false);///Tells Bitwig to delete previous color association. 
-		parameter.setIndication(true );///Tells BitWig to associate the color with the parameters. 
+		parameter.setIndication(true);///Tells BitWig to associate the color with the parameters. 
 		macro.setIndication(true);
 		//track.getVolume().setIndication(false);
 		//track.getPan().setIndication(false);
@@ -219,7 +250,8 @@ devicePage.updateIndications = function()
 
 function onMidi(status, data1, data2)
 	{
-		//println(status + " " + data1 + " " + data2)
+		
+		//printMidi(status, data1, data2)
 		
 			if (isChannelController(status))
 			{   
@@ -244,8 +276,7 @@ function onMidi(status, data1, data2)
 					}
 
 			}else{
-				//println(hasContent);
-				//println(data1 + " " + data2 + " " + status)
+				
 				rootOffsetIndex(data1, data2)
 				scaleTypeScroll(data1, data2);
 				scaleIndexScroll(data1, data2);
@@ -253,22 +284,25 @@ function onMidi(status, data1, data2)
 				parameterSelect(data1, data2);
 				trackSelect(data1, data2);
 				pageSelect(data1, data2);
-				
-				if (modeSelect == true)
-						{
-							if (data1 < 8)
+				clipLaunching(data1, data2)
+				clipScroll(data1, data2)
+			
+							if (modeSelect == true && data1 < 8)
 							{	
+							
 								padPage = notePage
 								
-							}else if (modeSelect = true && data1 > 7 && data1 < 16)
+							}else if (modeSelect == true && data1 > 7 && data1 < 16 )
 							{
 								padPage = clipPage
 								
 							}
-						}
-
-				if (data1 == 127 && data2 == 127)
+						
+				
+				if (data1 == 32 && data2 == 127)
 				{
+					println(padPage)		
+					noteIn.setKeyTranslationTable(noteOffTable)
 					for (var i = 0; i < 32; i ++)
 					{
 						sendMidi(144, i, 0); //clear all Pads
@@ -283,13 +317,18 @@ function onMidi(status, data1, data2)
 					}
 					
 					modeSelect = true;
-					println(modeSelect)
-					noteIn.setKeyTranslationTable(noteOffTable);
+					
+					
+					//println(modeSelect)
 				}	
 					
 
-				if (data1 == 127 && data2 == 0)
+				if (data1 == 32 && data2 == 0)
 					{
+						for (var i = 0; i < 32; i ++)
+							{
+								sendMidi(144, i, 0); //clear all Pads
+							}
 						modeSelect = false
 						if (padPage == notePage)
 						{
@@ -297,7 +336,11 @@ function onMidi(status, data1, data2)
 							noteIn.setKeyTranslationTable(translationTable);
 						}else if(padPage == clipPage)
 						{
+
 							clipLED();
+							for (i = 0; i <16 ;i ++){
+									sendClipLEDs(i) 
+								}
 							noteIn.setKeyTranslationTable(noteOffTable);
 						}
 						
@@ -313,5 +356,9 @@ function onMidi(status, data1, data2)
 
 function exit()
 	{
+		for (var i = 0; i < 32; i ++)
+					{
+						sendMidi(144, i, 0); //clear all Pads
+					}
 
 	}

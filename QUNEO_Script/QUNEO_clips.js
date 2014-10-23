@@ -1,177 +1,323 @@
 //Clip Launching Mode
 
+function GREEN(pad){
+	sendMidi(144, pad * 2, 127)
+	sendMidi(144, pad * 2 + 1, 0)
+}
+
+function RED(pad){
+	sendMidi(144, pad * 2, 0)
+	sendMidi(144, pad * 2 + 1, 127)
+}
+
+function YELLOW1(pad){
+	sendMidi(144, pad * 2, 50)
+	sendMidi(144, pad * 2 + 1, 5)
+}
+
+function OFF(pad){
+	sendMidi(144, pad * 2, 0)
+	sendMidi(144, pad * 2 + 1, 0)
+}
+
 function clipLED()
 {
-	for (var i = 0; i < 32; i ++)
-	{
-		sendMidi(144, i, 0); //clear all Pads
-	}
 	contentLED();
 	playingLED();
-	
-		
+	recordingLED();
+	clipUpdate();
+
+}
+
+
+function clipScroll(data1, data2)
+{
+	if (padPage == clipPage){
+		if(data1 == 25 && data2 == 127){
+			trackBank.scrollScenesUp()
+			println("hey")
+		}else if(data1 == 26 && data2 == 127){
+			trackBank.scrollScenesDown()
+
+		}else if(data1 == 27 && data2 == 127){
+			trackBank.scrollTracksDown()
+
+		} else if(data1 == 28 && data2 == 127){
+			trackBank.scrollTracksUp()
+
+		} 
+	}
+
+
+
+
+
+}
+
+
+
+
+function clipLaunching(data1, data2)
+{
+	if (padPage == clipPage && modeSelect == false){
+		if((data1 % 4 == 0) && (data2 > 0)){
+			trackBank.getTrack(0).getClipLauncher().launch(3 - (data1/4))
+		}else if ((data1 % 4 == 1) && (data2 > 0)){
+			trackBank.getTrack(1).getClipLauncher().launch(3 - ((data1 - 1)/4))
+		}else if ((data1 % 4 == 2) && (data2 > 0)){
+			trackBank.getTrack(2).getClipLauncher().launch(3 - ((data1 - 2)/4))
+		}else if ((data1 % 4 == 3) && (data2 > 0)){
+			trackBank.getTrack(3).getClipLauncher().launch(3 - ((data1 - 3)/4))
+		}
+
+
+
+	} 
+
+
 }
 
 function contentLED()
 {
-	if (hasContent[0] >1){
-			sendMidi(144, 24, 10)
-			sendMidi(144, 25, 10)
+	for(i = 0; i < 16; i++){
+		if (hasContent[i] == true){
+			pendingLEDs[i] = 1
+		}else if (hasContent[i] == false){
+			pendingLEDs[i] = 0
 		}
+	}
 
-		if (hasContent[1] == true){
-			sendMidi(144, 26, 10)
-			sendMidi(144, 27, 10)
-		}
-
-		if (hasContent[2] == true){
-			sendMidi(144, 28, 10)
-			sendMidi(144, 29, 10)
-		}
-
-		if (hasContent[3] == true){
-			sendMidi(144, 30, 10)
-			sendMidi(144, 31, 10)
-		}
-
-		if (hasContent[4] == true){
-			sendMidi(144, 16, 10)
-			sendMidi(144, 17, 10)
-		}
-
-		if (hasContent[5] == true){
-			sendMidi(144, 18, 10)
-			sendMidi(144, 19, 10)
-		}
-
-		if (hasContent[6] == true){
-			sendMidi(144, 20, 10)
-			sendMidi(144, 21, 10)
-		}
-
-		if (hasContent[7] == true){
-			sendMidi(144, 22, 10)
-			sendMidi(144, 23, 10)
-		}
-
-		if (hasContent[8] == true){
-			sendMidi(144, 8, 10)
-			sendMidi(144, 9, 10)
-		}
-
-		if (hasContent[9] == true){
-			sendMidi(144, 10, 10)
-			sendMidi(144, 11, 10)
-		}
-
-		if (hasContent[10] == true){
-			sendMidi(144, 12, 10)
-			sendMidi(144, 13, 10)
-		}
-
-		if (hasContent[11] == true){
-			sendMidi(144, 14, 10)
-			sendMidi(144, 15, 10)
-		}
-		if (hasContent[12] == true){
-			sendMidi(144, 0, 10)
-			sendMidi(144, 1, 10)
-		}
-
-		if (hasContent[13] == true){
-			sendMidi(144, 2, 10)
-			sendMidi(144, 3, 10)
-		}
-
-		if (hasContent[14] == true){
-			sendMidi(144, 4, 10)
-			sendMidi(144, 5, 10)
-		}
-
-		if (hasContent[15] == true){
-			sendMidi(144, 6, 10)
-			sendMidi(144, 7, 10)
-		}
 }
+
 
 function playingLED()
 {
-	if (isPlaying[0] == true){
-			sendMidi(144, 24, 127)
-			sendMidi(144, 25, 10)
+	for(i = 0; i < 16; i++){
+		if (isPlaying[i] == true){
+			pendingLEDs[i] = 2
 		}
-
-		if (isPlaying[1] == true){
-			sendMidi(144, 26, 127)
-			sendMidi(144, 27, 10)
-		}
-
-		if (isPlaying[2] == true){
-			sendMidi(144, 28, 127)
-			sendMidi(144, 29, 10)
-		}
-
-		if (isPlaying[3] == true){
-			sendMidi(144, 30, 127)
-			sendMidi(144, 31, 10)
-		}
-
-		if (isPlaying[4] == true){
-			sendMidi(144, 16, 127)
-			sendMidi(144, 17, 10)
-		}
-
-		if (isPlaying[5] == true){
-			sendMidi(144, 18, 127)
-			sendMidi(144, 19, 10)
-		}
-
-		if (isPlaying[6] == true){
-			sendMidi(144, 20, 127)
-			sendMidi(144, 21, 10)
-		}
-
-		if (isPlaying[7] == true){
-			sendMidi(144, 22, 127)
-			sendMidi(144, 23, 10)
-		}
-
-		if (isPlaying[8] == true){
-			sendMidi(144, 8, 127)
-			sendMidi(144, 9, 10)
-		}
-
-		if (isPlaying[9] == true){
-			sendMidi(144, 10, 127)
-			sendMidi(144, 11, 10)
-		}
-
-		if (isPlaying[10] == true){
-			sendMidi(144, 12, 127)
-			sendMidi(144, 13, 10)
-		}
-
-		if (isPlaying[11] == true){
-			sendMidi(144, 14, 127)
-			sendMidi(144, 15, 10)
-		}
-		if (isPlaying[12] == true){
-			sendMidi(144, 0, 127)
-			sendMidi(144, 1, 10)
-		}
-
-		if (isPlaying[13] == true){
-			sendMidi(144, 2, 127)
-			sendMidi(144, 3, 10)
-		}
-
-		if (isPlaying[14] == true){
-			sendMidi(144, 4, 127)
-			sendMidi(144, 5, 10)
-		}
-
-		if (isPlaying[15] == true){
-			sendMidi(144, 6, 127)
-			sendMidi(144, 7, 10)
-		}
+	}
 }
+
+function recordingLED()
+{
+for (i = ; i <16; i ++)
+
+}
+
+
+function clipUpdate()
+{
+	for(i = 0; i < 16; i ++){
+		if (pendingLEDs[i] != currentLEDs[i]){
+			currentLEDs[i] = pendingLEDs[i]
+			sendClipLEDs(i)
+
+		}
+
+
+
+	}
+
+}
+
+function sendClipLEDs(index){
+	switch(index){
+		case 0:
+			if(currentLEDs[index] == 0){
+				OFF(12)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(12)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(12)
+			}
+			break;
+		case 1:
+			if(currentLEDs[index] == 0){
+				OFF(13)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(13)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(13)
+			}
+			break;
+		case 2:
+			if(currentLEDs[index] == 0){
+				OFF(14)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(14)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(14)
+			}
+			break;
+		case 3:
+			if(currentLEDs[index] == 0){
+				OFF(15)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(15)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(15)
+			}
+			break;
+		case 4:
+			if(currentLEDs[index] == 0){
+				OFF(8)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(8)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(8)
+			}
+			break;
+		case 5:
+			if(currentLEDs[index] == 0){
+				OFF(9)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(9)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(9)
+			}
+			break;
+		case 6:
+			if(currentLEDs[index] == 0){
+				OFF(10)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(10)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(10)
+			}
+			break;
+		case 7:
+			if(currentLEDs[index] == 0){
+				OFF(11)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(11)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(11)
+			}
+			break;
+		case 8:
+			if(currentLEDs[index] == 0){
+				OFF(4)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(4)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(4)
+			}
+			break;
+		case 9:
+			if(currentLEDs[index] == 0){
+				OFF(5)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(5)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(5)
+			}
+			break;
+		case 10:
+			if(currentLEDs[index] == 0){
+				OFF(6)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(6)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(6)
+			}
+			break;
+		case 11:
+			if(currentLEDs[index] == 0){
+				OFF(7)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(7)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(7)
+			}
+			break;
+		case 12:
+			if(currentLEDs[index] == 0){
+				OFF(0)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(0)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(0)
+			}
+			break;
+		case 13:
+			if(currentLEDs[index] == 0){
+				OFF(1)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(1)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(1)
+			}
+			break;
+		case 14:
+			if(currentLEDs[index] == 0){
+				OFF(2)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(2)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(2)
+			}
+			break;
+		case 15:
+			if(currentLEDs[index] == 0){
+				OFF(3)
+
+			}else if (currentLEDs[index] == 1){
+				YELLOW1(3)
+
+			}else if (currentLEDs[index] == 2){
+				GREEN(3)
+			}
+			break;	
+	}
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

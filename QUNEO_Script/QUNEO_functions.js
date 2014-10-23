@@ -72,6 +72,14 @@ function trackSelect(data1, data2)
  			if(data1 == 18 && data2 != 0) 
 				{
 					parameterHasChanged = 1;
+					for ( var p = 0; p < 8; p++)
+						{
+							
+							parameter = primaryDevice.getParameter(p);
+							track = trackBank.getTrack(p);
+							parameter.setIndication(false);///Tells Bitwig to delete previous color association. 
+							
+						}
 					primaryDevice.nextParameterPage();
 					devicePage.updateIndications();
 					if (pageNames[paramPage] == undefined){
@@ -180,7 +188,8 @@ function macroLED(index, value)
 function pageSelect(data1, data2)
 	{
 		if (data1 == 23)
-		{
+		{	
+
 			activePage = parameterPage
 			for (var p = 1; p < 5; p ++)
 			for (var p = 8; p < 12; p ++)

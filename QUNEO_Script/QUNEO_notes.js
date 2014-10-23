@@ -343,6 +343,7 @@ function updateTranslationTable ()
 
 		}
 		noteIn.setKeyTranslationTable(translationTable);
+		//noteIn.setShouldConsumeEvents(true);
 		
 	}
 
