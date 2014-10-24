@@ -52,7 +52,8 @@ var isRecording = initArray(0, 16);
 var isQueued = initArray(0, 16);
 var pendingLEDs = initArray(0, 15);
 var currentLEDs = initArray(0,15);
-
+var HIGHEST_CC = 119;
+var LOWEST_CC = 12;
 
 
 function init()
@@ -60,7 +61,7 @@ function init()
 	host.getMidiInPort(0).setMidiCallback(onMidi);
 	noteIn = host.getMidiInPort(0).createNoteInput("QUNEO", "82????", "92????")
 	noteIn.setShouldConsumeEvents(false);
-	println("These ARE the pads you're looking....guy")
+	//println("These ARE the pads you're looking....guy")
 	sendMidi(144, 36, 127);
 	sendMidi(144, 37, 127);
 	sendMidi(144, 38, 127);
@@ -73,14 +74,30 @@ function init()
 	noteIn.setShouldConsumeEvents(false);
 
 	//standardVelocity();
+	//
+	notif = host.getNotificationSettings();
+
+    notif.setShouldShowChannelSelectionNotifications(true);
+    notif.setShouldShowDeviceLayerSelectionNotifications(true);
+    notif.setShouldShowDeviceSelectionNotifications(true);
+    notif.setShouldShowMappingNotifications(true);
+    notif.setShouldShowPresetNotifications(false);
+    notif.setShouldShowSelectionNotifications(true);
+    notif.setShouldShowTrackSelectionNotifications(true);
+    notif.setShouldShowValueNotifications(false);
     
+    userControls = host.createUserControlsSection(HIGHEST_CC - LOWEST_CC + 1);
+    for(var i=LOWEST_CC; i<=HIGHEST_CC; i++)
+	   {
+	      userControls.getControl(i - LOWEST_CC).setLabel("CC" + i);
+	   }
 	////////Views
 
 	transport = host.createTransport();
 	application = host.createApplication();
 	trackBank = host.createTrackBank(4, 2, 4);
 	cursorTrack = host.createCursorTrack(2, 0);
-	cursorDevice = host.createCursorDeviceSection(8);
+	//cursorDevice = host.createCursorDeviceSection(8);
 	primaryDevice = cursorTrack.getPrimaryDevice();
 	primaryInstrument = cursorTrack.getPrimaryInstrument();
 	arranger = host.createArranger(0);
@@ -88,22 +105,14 @@ function init()
 
 	//Observers
 
-	master.addVuMeterObserver(127 , -1, false, function(value)
+	/*master.addVuMeterObserver(127 , -1, false, function(value)
 	{
 		sendMidi(176, 5, value); 
-	})
+	})*/
 	
-	var string = "trackName"
-	cursorTrack.addNameObserver(128, string ,function(name)
-	{
-		trackName = name;
-
-		if (trackHasChanged == 1){
-		host.showPopupNotification("Track = " + trackName);	
-		trackHasChanged = 0;
-		}
+	master.getVolume().addValueObserver(128, function(value){
+		sendMidi(176, 5, value)
 	})
-
 
 	cursorTrack.getSend(0).addValueObserver(128 ,function(value)
 	{
@@ -125,7 +134,9 @@ function init()
       recObserver(on);
 	});
 	
-	primaryDevice.addPageNamesObserver(function(names)
+
+	///////DEPRECATED_ All is handled by Bitwig. 
+	/*primaryDevice.addPageNamesObserver(function(names)
    {
       pageNames = arguments;
 
@@ -135,17 +146,18 @@ function init()
 	{	
 		
 		paramPage = page;
-		if (parameterHasChanged == 1){
+		/*if (parameterHasChanged == 1){
 			if (pageNames[paramPage] != undefined){
 			host.showPopupNotification("Parameter Page = " + pageNames[paramPage]);
 		}
 		parameterHasChanged = 0;
 		}
-	})
+	})*/
 
 
 
 	//Parameters
+	
 	for ( var p = 0; p < 8; p++)
 	{
 		
@@ -160,7 +172,6 @@ function init()
 				}
 			
 		}));
-		// parameter.setLabel("P" + (p + 1));
 	}
 
 	for (var p = 0; p < 8; p++)
@@ -203,8 +214,6 @@ function init()
 	
 	devicePage.updateIndications();
 
-	host.showPopupNotification("These ARE the pads you're looking....guy");
-
 		if (initialize == 0){
 			padLED();
 			initialize = 1
@@ -237,10 +246,10 @@ devicePage.updateIndications = function()
 {
 	for ( var p = 0; p < 8; p++)
 	{
-		macro = primaryInstrument.getMacro(p).getAmount();
+		macro = primaryDevice.getMacro(p).getAmount();
 		parameter = primaryDevice.getParameter(p);
 		track = trackBank.getTrack(p);
-		parameter.setIndication(false);///Tells Bitwig to delete previous color association. 
+		//parameter.setIndication(false);///Tells Bitwig to delete previous color association. 
 		parameter.setIndication(true);///Tells BitWig to associate the color with the parameters. 
 		macro.setIndication(true);
 		//track.getVolume().setIndication(false);
@@ -252,7 +261,7 @@ devicePage.updateIndications = function()
 function onMidi(status, data1, data2)
 	{
 		
-		//printMidi(status, data1, data2)
+		 printMidi(status, data1, data2)
 		
 			if (isChannelController(status))
 			{   
@@ -274,7 +283,15 @@ function onMidi(status, data1, data2)
 							{
 								cursorTrack.getSend(1).set(data2, 128);
 							}	
+					}else if (data1 == 11){
+						master.getVolume().set(data2, 128)
 					}
+
+		      if (data1 >= LOWEST_CC && data1 <= HIGHEST_CC)
+		      	{
+		         var index = data1 - LOWEST_CC;
+		         userControls.getControl(index).set(data2, 128);
+		    }
 
 			}else{
 				
