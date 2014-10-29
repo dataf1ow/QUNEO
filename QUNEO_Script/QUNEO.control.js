@@ -33,6 +33,10 @@ var initialize = 0;
 var paramPage = 1;
 var pageNames = [8];
 var isMacroMapping = [];
+var transportPlay = 0
+var transportRec = 0
+var masterValue = 0;
+var sendValues = [0,0]
 var paramValues =  initArray(0, 8);
 var macroValues =  initArray(0, 8);
 var trackName = "tracks";
@@ -59,6 +63,7 @@ var LOWEST_CC = 12;
 function init()
 {
 	host.getMidiInPort(0).setMidiCallback(onMidi);
+	host.getMidiInPort(0).setSysexCallback(onSysex);
 	noteIn = host.getMidiInPort(0).createNoteInput("QUNEO", "82????", "92????")
 	noteIn.setShouldConsumeEvents(false);
 	//println("These ARE the pads you're looking....guy")
@@ -71,7 +76,6 @@ function init()
 	
 	updateTranslationTable();
 	noteIn.setKeyTranslationTable(translationTable);
-	noteIn.setShouldConsumeEvents(false);
 
 	//standardVelocity();
 	//
@@ -85,6 +89,8 @@ function init()
     notif.setShouldShowSelectionNotifications(true);
     notif.setShouldShowTrackSelectionNotifications(true);
     notif.setShouldShowValueNotifications(false);
+
+   //////User Control Settings
     
     userControls = host.createUserControlsSection(HIGHEST_CC - LOWEST_CC + 1);
     for(var i=LOWEST_CC; i<=HIGHEST_CC; i++)
@@ -104,34 +110,34 @@ function init()
 	master = host.createMasterTrack(8);
 
 	//Observers
-
-	/*master.addVuMeterObserver(127 , -1, false, function(value)
-	{
-		sendMidi(176, 5, value); 
-	})*/
 	
-	master.getVolume().addValueObserver(128, function(value){
+	master.getVolume().addValueObserver(128, function(value)
+	{
 		sendMidi(176, 5, value)
+		masterValue = value
 	})
 
 	cursorTrack.getSend(0).addValueObserver(128 ,function(value)
 	{
 		sendMidi(176, 6, value);
+		sendValues[0] = value
 	})
 	
 	cursorTrack.getSend(1).addValueObserver(128 ,function(value)
 	{
 		sendMidi(176, 7, value);
+		sendValues[1] = value
 	})
 
 	transport.addIsPlayingObserver(function(on)
 	{
 		playObserver(on);
+
 	})
 
 	transport.addIsRecordingObserver(function(on)
 	{
-      recObserver(on);
+      	recObserver(on);
 	});
 	
 
@@ -220,6 +226,8 @@ function init()
 		}
 	padPage = notePage
 }
+/////Functions!
+
 
 function makeIndexedFunction(index, f)
 { 
@@ -261,7 +269,7 @@ devicePage.updateIndications = function()
 function onMidi(status, data1, data2)
 	{
 		
-		 printMidi(status, data1, data2)
+		 //printMidi(status, data1, data2)
 		
 			if (isChannelController(status))
 			{   
@@ -368,7 +376,47 @@ function onMidi(status, data1, data2)
 		
 	}
 
+function onSysex(data)
+{
+	if (String(data) == "f07e00060300015f1e0000001e12000ff7")
+	{	
+		
+		sendMidi(144, 36, 127);
+		sendMidi(144, 37, 127);
+		sendMidi(144, 38, 127);
+		sendMidi(144, 39, 127);
+		sendMidi(144, 42, 127);
+		sendMidi(144, 43, 127);
+		if (padPage == notePage)
+		{
+			padLED();
 
+		} 
+
+		if(padPage == clipPage)
+		{
+			clipLED();
+			for (i = 0; i <16 ;i ++){
+					sendClipLEDs(i) 
+				}
+		}
+	
+		if (activePage == parameterPage){
+			host.scheduleTask(function()
+			{restoreParameters()
+			},null,30)
+		}
+		if (activePage == macroPage){
+			host.scheduleTask(function()
+			{restoreMacros()
+			},null,30)
+		}
+		sendMidi(176, 5, masterValue)
+		restoreTransport()
+		restoreSends()	
+	}
+
+}
 
 
 

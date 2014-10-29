@@ -8,9 +8,43 @@ function transportControl(status, data1, data2){
 	}
 };
 
+function restoreTransport()
+{
+	if (transportPlay)
+	{
+		sendMidi(144, 35, 127);
+		sendMidi(144, 34, 0);
+
+	}else
+	{
+		sendMidi(144, 35, 0);
+		sendMidi(144, 34, 127)
+		
+	}
+
+	if (transportRec)
+	{
+		sendMidi(144, 33, 127);
+	}else
+	{
+		sendMidi(144, 33, 0);	
+	}
+}
+
+function restoreMaster()
+{
+
+}
+
+function restoreSends()
+{
+	sendMidi(176, 6, sendValues[0]);
+	sendMidi(176, 7, sendValues[1]);
+}
+
 function playObserver(on)
 	{
-		isPlay = on;
+		transportPlay = on;
 		if (on == true){
 			sendMidi(144, 35, 127);
 			sendMidi(144, 34, 0);
@@ -22,7 +56,7 @@ function playObserver(on)
 
 function recObserver(on)
 	{
-		isRec = on;
+		transportRec = on;
  		if (on == true){
  			sendMidi(144, 33, 127);
  		}else{

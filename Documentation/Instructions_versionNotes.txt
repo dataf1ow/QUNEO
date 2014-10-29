@@ -1,7 +1,7 @@
 
 This is the KMI bigwig script for the QuNeo controller
 
-Import the QuNeo preset to your QuNeo using the editor. There aren’t any name displays, the preset will overwrite whichever slot you have selected on import. Be sure to use a slot that you aren’t fond of. Of course, you can restore defaults at any time, and then re-import on a different slot. 
+Import the QuNeo preset to your QuNeo using the editor. I recommend using slot 16 (the upper right corner. I have included a syses callback that restore all the LED feedback when returning to slot 16. If you use a different slot, and change presets, or accidentally hit the blue preset selection button in the upper left, the LED feedback will   not be visible until you interact with the device. 
 
 Drop The 'QUNEO_Script'folder into the 'ControlSurfaceScripts' folder in the User Control script folder: 
  
