@@ -115,17 +115,36 @@ function init()
 	{
 		sendMidi(176, 5, value)
 		masterValue = value
+		
 	})
+
+	cursorTrack.addTrackTypeObserver(10, "track", function(name)
+		{
+			if (name == "Effect" || name == "Master"){
+				sendMidi(176, 6, 0)
+				sendMidi(176, 7, 0)
+
+			}
+		})
 
 	cursorTrack.getSend(0).addValueObserver(128 ,function(value)
 	{
-		sendMidi(176, 6, value);
+		display = (value + 64) % 128
+		if (display > 63 && display < 72){
+			display = 72
+		}
+		sendMidi(176, 6, display)
 		sendValues[0] = value
+		
 	})
 	
 	cursorTrack.getSend(1).addValueObserver(128 ,function(value)
 	{
-		sendMidi(176, 7, value);
+		display = (value + 64) % 128
+		if (display > 63 && display < 72){
+			display = 72
+		}
+		sendMidi(176, 7, display)
 		sendValues[1] = value
 	})
 
@@ -286,10 +305,10 @@ function onMidi(status, data1, data2)
 					}else if (data1 > 8 && data1 < 11)
 						{ if (data1 == 9)
 							{
-								cursorTrack.getSend(0).set(data2,128);
+								cursorTrack.getSend(0).set((data2 + 64) % 128,128);
 						}else
 							{
-								cursorTrack.getSend(1).set(data2, 128);
+								cursorTrack.getSend(1).set((data2 + 64) % 128, 128);
 							}	
 					}else if (data1 == 11){
 						master.getVolume().set(data2, 128)
@@ -313,16 +332,16 @@ function onMidi(status, data1, data2)
 				clipLaunching(data1, data2)
 				clipScroll(data1, data2)
 			
-							if (modeSelect == true && data1 < 8)
-							{	
-							
-								padPage = notePage
-								
-							}else if (modeSelect == true && data1 > 7 && data1 < 16 )
-							{
-								padPage = clipPage
-								
-							}
+				if (modeSelect == true && data1 < 8)
+				{	
+				
+					padPage = notePage
+					
+				}else if (modeSelect == true && data1 > 7 && data1 < 16 )
+				{
+					padPage = clipPage
+					
+				}
 						
 				
 				if (data1 == 32 && data2 == 127)

@@ -35,14 +35,14 @@ function clipScroll(data1, data2)
 	if (padPage == clipPage){
 		if(data1 == 25 && data2 == 127){
 			trackBank.scrollScenesUp()
-			println("hey")
+
 		}else if(data1 == 26 && data2 == 127){
 			trackBank.scrollScenesDown()
 
-		}else if(data1 == 27 && data2 == 127){
+		}else if(data1 == 28 && data2 == 127){
 			trackBank.scrollTracksDown()
 
-		} else if(data1 == 28 && data2 == 127){
+		} else if(data1 == 27 && data2 == 127){
 			trackBank.scrollTracksUp()
 
 		} 
